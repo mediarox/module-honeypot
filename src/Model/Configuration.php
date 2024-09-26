@@ -1,13 +1,13 @@
 <?php
 
-namespace Actiview\Honeypot\Model;
+namespace Mediarox\Honeypot\Model;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
 
 /**
  * Class Configuration
  *
- * @package Actiview\Honeyput
+ * @package Mediarox\Honeypot
  */
 class Configuration
 {

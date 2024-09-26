@@ -1,14 +1,14 @@
 <?php
 
-namespace Actiview\Honeypot\Block;
+namespace Mediarox\Honeypot\Block;
 
 use Magento\Framework\View\Element\Template;
-use Actiview\Honeypot\Model\Configuration;
+use Mediarox\Honeypot\Model\Configuration;
 
 /**
  * Class Honeypot
  *
- * @package Actiview\Honeypot
+ * @package Mediarox\Honeypot
  */
 class Honeypot extends Template
 {

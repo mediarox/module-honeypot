@@ -1,43 +1,25 @@
 <?php
 
-namespace Actiview\Honeypot\Observer;
+namespace Mediarox\Honeypot\Observer;
 
-use Actiview\Honeypot\Model\Configuration;
-use Magento\Framework\App\ActionInterface;
+use Mediarox\Honeypot\Model\Configuration;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\Result\Forward;
 use Magento\Framework\Controller\Result\ForwardFactory;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Framework\Exception\NotFoundException;
 
 /**
  * Class ControllerActionPredispatchObserver
  *
- * @package Actiview\Honeypot
+ * @package Mediarox\Honeypot
  */
 class ControllerActionPredispatchObserver implements ObserverInterface
 {
-    /**
-     * @var Configuration
-     */
-    protected $configuration;
-
-    /**
-     * @var ForwardFactory
-     */
-    protected $forwardFactory;
-
-    /**
-     * @param Configuration $configuration
-     * @param ForwardFactory $forwardFactory
-     */
     public function __construct(
-        Configuration $configuration,
-        ForwardFactory $forwardFactory
+        private Configuration $configuration,
+        private ForwardFactory $forwardFactory
     ) {
-        $this->configuration = $configuration;
-        $this->forwardFactory = $forwardFactory;
     }
 
     /**

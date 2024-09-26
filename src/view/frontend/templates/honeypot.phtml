@@ -1,9 +1,9 @@
 <?php
-/** @var \Actiview\Honeypot\Block\Honeypot $block */
+/** @var \Mediarox\Honeypot\Block\Honeypot $block */
 
 $jsConfig = [
-    'forms' => $block->getForms(),
-    'fieldName' => $block->getFieldName(),
+    'forms'      => $block->getForms(),
+    'fieldName'  => $block->getFieldName(),
     'fieldClass' => $block->getFieldClass(),
 ];
 ?>
@@ -11,7 +11,7 @@ $jsConfig = [
 <script type="text/x-magento-init">
     {
         "*": {
-            "Actiview_Honeypot/js/model/honeypot": <?= json_encode($jsConfig) ?>
+            "Mediarox_Honeypot/js/model/honeypot": <?= json_encode($jsConfig) ?>
         }
     }
 </script>

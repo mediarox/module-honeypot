@@ -1,5 +1,5 @@
 {
-  "name": "actiview/module-honeypot",
+  "name": "mediarox/module-honeypot",
   "description": "Magento 2 honeypot spam prevention",
   "keywords": [
     "magento",
@@ -12,6 +12,12 @@
   "authors": [
     {
       "name": "Rik Willems"
+    },
+    {
+      "name": "M. Bernt",
+      "email": "mbernt@mediarox.de",
+      "homepage": "https://www.mediarox.de/",
+      "role": "Developer"
     }
   ],
   "minimum-stability": "dev",
@@ -21,7 +27,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Actiview\\Honeypot\\": "src/"
+      "Mediarox\\Honeypot\\": "src/"
     },
     "files": [
       "src/registration.php"
