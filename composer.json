@@ -7,6 +7,7 @@
     "honeypot",
     "spam"
   ],
+  "version": "0.0.1",
   "type": "magento2-module",
   "license": "OSL-3.0",
   "authors": [

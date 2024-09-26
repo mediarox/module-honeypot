@@ -13,8 +13,10 @@ Module configuration can be found in the backend: 'Stores' > 'Configuration' > '
 
 ## Changelog
 
-### 0.1.0 
-First release of this module.
+### 0.0.1 
+Refactored original module created by Rik Willems.
+Module now observes dom mutations to handle content that is
+delivered by knockout after dom is ready.
 
 ## Support & bugs
 Please create an issue in GitHub's [issue tracker](https://github.com/actiview/module-honeypot/issues).
