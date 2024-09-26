@@ -19,4 +19,4 @@ Module now observes dom mutations to handle content that is
 delivered by knockout after dom is ready.
 
 ## Support & bugs
-Please create an issue in GitHub's [issue tracker](https://github.com/actiview/module-honeypot/issues).
+Please create an issue in GitHub's [issue tracker](https://github.com/mediarox/module-honeypot/issues).
