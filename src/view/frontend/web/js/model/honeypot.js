@@ -7,7 +7,6 @@ define([
 
     return Component.extend({
         defaults: {
-            forms: [],
             fieldName: '',
             fieldClass: ''
         },
@@ -22,22 +21,25 @@ define([
             _.each(domFroms, function (form) {
                 this.addHoneypot(form);
             }, this);
-            this.observerMutations(this.forms, this.fieldName, this.fieldClass);
+            this.observerMutations(this.fieldName, this.fieldClass);
         },
 
 
-        observerMutations: function (forms, fieldName, fieldClass) {
+        observerMutations: function (fieldName, fieldClass) {
             let observer = new MutationObserver(mutations => {
 
                 for(let mutation of mutations) {
-                    // examine new nodes, is there anything to highlight?
-
                     for(let node of mutation.addedNodes) {
                         // we track only elements, skip other nodes (e.g. text nodes)
                         if (!(node instanceof HTMLElement)) continue;
 
-                        // check the inserted element for being a form
-                        let forms = node.querySelectorAll('form');
+                        let forms = [];
+                        // check the inserted element for containing forms
+                        if (node.tagName === 'FORM') {
+                            forms.push(node);
+                        } else {
+                            forms = node.querySelectorAll('form');
+                        }
                         if (forms.length > 0) {
                             _.forEach(forms, form => {
                                 this.addHoneypot(form);
