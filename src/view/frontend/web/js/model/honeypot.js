@@ -43,6 +43,7 @@ define([
                         if (forms.length > 0) {
                             _.forEach(forms, form => {
                                 this.addHoneypot(form);
+                                this.addTimestamp(form);
                             })
                         }
                     }
@@ -59,6 +60,16 @@ define([
             element.name = this.fieldName;
             element.className = this.fieldClass;
             element.style.cssText = 'display: none';
+            form.appendChild(element);
+        },
+
+        addTimestamp: function (form) {
+            var element = document.createElement('input');
+            element.type = 'text';
+            element.name = 'timestamp';
+            element.className = this.fieldClass;
+            element.style.cssText = 'display: none';
+            element.value = Date.now();
             form.appendChild(element);
         }
     })
