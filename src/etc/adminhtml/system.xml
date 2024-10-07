@@ -25,7 +25,7 @@
                 </field>
                 <field id="forms" translate="label" type="textarea" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Forms (css selector)</label>
-                    <comment>Which forms to protect with the honeypot. Use complete class selector(e.g. '.form.login-form) or id.</comment>
+                    <comment>Which forms to protect with the honeypot. Use complete class selector(e.g. '.form.login-form) or id. One selector per line.</comment>
                 </field>
             </group>
         </section>
