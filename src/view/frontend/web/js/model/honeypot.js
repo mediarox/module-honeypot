@@ -7,6 +7,7 @@ define([
 
     return Component.extend({
         defaults: {
+            forms: [],
             fieldName: '',
             fieldClass: ''
         },
@@ -17,41 +18,53 @@ define([
         },
 
         extendForms: function () {
-            let domFroms = document.getElementsByTagName('form');
+            let domFroms = document.querySelectorAll(this.forms);
             _.each(domFroms, function (form) {
                 this.addHoneypot(form);
+                this.addTimestamp(form);
             }, this);
-            this.observerMutations(this.fieldName, this.fieldClass);
+            this.observerMutations();
         },
 
 
-        observerMutations: function (fieldName, fieldClass) {
+        observerMutations: function () {
             let observer = new MutationObserver(mutations => {
-
+                let that = this;
                 for(let mutation of mutations) {
                     for(let node of mutation.addedNodes) {
                         // we track only elements, skip other nodes (e.g. text nodes)
                         if (!(node instanceof HTMLElement)) continue;
 
-                        let forms = [];
-                        // check the inserted element for containing forms
-                        if (node.tagName === 'FORM') {
-                            forms.push(node);
-                        } else {
-                            forms = node.querySelectorAll('form');
-                        }
-                        if (forms.length > 0) {
-                            _.forEach(forms, form => {
+                        let domFroms = this.getValidForms(node);
+                        if (domFroms.length > 0) {
+                            _.forEach(domFroms, form => {
                                 this.addHoneypot(form);
                                 this.addTimestamp(form);
                             })
                         }
                     }
                 }
-
             });
             let body = document.getElementsByTagName('body')[0];
             observer.observe(body, {attributes: false, childList: true, characterData: false, subtree:true});
+        },
+
+        getValidForms: function (node) {
+            let domFroms = [];
+            // check the inserted element for containing forms
+            if (node.tagName === 'FORM') {
+                let nodeClasses = node.className;
+                nodeClasses = nodeClasses.split(' ');
+                nodeClasses = '.' + nodeClasses.join('.');
+                let nodeId = '#' + node.id;
+                let validNode = this.forms.includes(nodeClasses) || this.forms.includes(nodeId);
+                if (validNode) {
+                    domFroms.push(node);
+                }
+            } else {
+                domFroms = node.querySelectorAll(this.forms);
+            }
+            return domFroms;
         },
 
         addHoneypot: function (form) {
@@ -73,6 +86,4 @@ define([
             form.appendChild(element);
         }
     })
-
-
 });

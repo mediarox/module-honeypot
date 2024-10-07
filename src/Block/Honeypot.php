@@ -12,6 +12,8 @@ use Mediarox\Honeypot\Model\Configuration;
  */
 class Honeypot extends Template
 {
+    protected Configuration $configuration;
+
     /**
      * @param Template\Context $context
      * @param Configuration $configuration
@@ -19,10 +21,11 @@ class Honeypot extends Template
      */
     public function __construct(
         Template\Context $context,
-        private Configuration $configuration,
+        Configuration $configuration,
         array $data = []
     ) {
         parent::__construct($context, $data);
+        $this->configuration = $configuration;
     }
 
     /**
@@ -51,5 +54,13 @@ class Honeypot extends Template
     public function getFieldClass()
     {
         return $this->configuration->getFieldClass();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getForms()
+    {
+        return $this->configuration->getForms();
     }
 }

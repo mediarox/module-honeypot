@@ -41,8 +41,8 @@ class ControllerActionPredispatchObserver implements ObserverInterface
         /** @var RequestInterface $request */
         $this->request = $observer->getEvent()
             ->getData('request');
-        $isPost = $this->request->isPost();
-        if ($isPost && $this->validateRequest()) {
+        $shouldValidate = $this->shouldValidateRequest();
+        if ($shouldValidate && $this->validateRequest()) {
             return $this->forwardFactory->create()
                 ->forward('noroute');
         }
@@ -103,5 +103,17 @@ class ControllerActionPredispatchObserver implements ObserverInterface
         }
 
         return $timeExceeded;
+    }
+
+    private function shouldValidateRequest(): bool
+    {
+        $isPost = $this->request->isPost();
+        $fullActionName = $this->request->getFullActionName();
+        $allowedAction = \in_array(
+            $fullActionName,
+            $this->configuration->getActions(),
+            true
+        );
+        return $allowedAction && $isPost;
     }
 }
