@@ -96,7 +96,8 @@ class ControllerActionPredispatchObserver implements ObserverInterface
     {
         $timeExceeded = false;
         if (isset($params['timestamp'])) {
-            $timestamp = $params['timestamp'] / 1000;
+            $integerTimestamp = (int)$params['timestamp'];
+            $timestamp = $integerTimestamp / 1000;
             $currentTimestamp = time();
             $timeElapsed = $currentTimestamp - $timestamp;
             $timeExceeded = ($timeElapsed < 2);
