@@ -16,6 +16,7 @@ class Configuration
     const XML_PATH_FIELD_CLASS = 'system/honeypot/field_class';
     const XML_PATH_ACTIONS = 'system/honeypot/actions';
     const XML_PATH_FORMS = 'system/honeypot/forms';
+    const XML_PATH_RESTRICTED_MAILS = 'system/honeypot/restricted_mails';
 
     /** @var ScopeConfigInterface */
     protected $scopeConfig;
@@ -82,6 +83,13 @@ class Configuration
     {
         return $this->trimExplode(
             $this->scopeConfig->getValue(self::XML_PATH_FORMS, $scopeType, $scopeCode)
+        );
+    }
+
+    public function getRestrictedMails($scopeType = 'store', $scopeCode = null)
+    {
+        return $this->trimExplode(
+            $this->scopeConfig->getValue(self::XML_PATH_RESTRICTED_MAILS, $scopeType, $scopeCode)
         );
     }
 

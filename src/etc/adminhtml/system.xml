@@ -27,6 +27,10 @@
                     <label>Forms (css selector)</label>
                     <comment>Which forms to protect with the honeypot. Use complete class selector(e.g. '.form.login-form) or id. One selector per line.</comment>
                 </field>
+                <field id="restricted_mails" translate="label" type="textarea" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Restricted Mail Addresses</label>
+                    <comment>List of mail addresses that should be blocked(e.g. test@example.com, @example.com). One (partial) address per line.</comment>
+                </field>
             </group>
         </section>
     </system>
