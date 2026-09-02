@@ -3,10 +3,9 @@
 namespace Mediarox\Honeypot\Observer;
 
 use Magento\Framework\App\RequestInterface;
-use Magento\Framework\Controller\Result\Forward;
-use Magento\Framework\Controller\Result\ForwardFactory;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Exception\NotFoundException;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Validator\NotEmpty;
 use Mediarox\Honeypot\Model\Configuration;
@@ -22,7 +21,6 @@ class ControllerActionPredispatchObserver implements ObserverInterface
 
     public function __construct(
         private Configuration       $configuration,
-        private ForwardFactory      $forwardFactory,
         private NotEmpty            $notEmpty,
         private SerializerInterface $serializer
     ) {
@@ -30,9 +28,10 @@ class ControllerActionPredispatchObserver implements ObserverInterface
 
     /**
      * @param Observer $observer
-     * @return void|Forward
+     * @return void
+     * @throws NotFoundException
      */
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void
     {
         if (!$this->configuration->isEnabled()) {
             return;
@@ -43,8 +42,13 @@ class ControllerActionPredispatchObserver implements ObserverInterface
             ->getData('request');
         $shouldValidate = $this->shouldValidateRequest();
         if ($shouldValidate && $this->validateRequest()) {
-            return $this->forwardFactory->create()
-                ->forward('noroute');
+            // Throwing is what stops the action. Returning a Forward result -
+            // what this used to do - stops nothing: Event\Invoker\InvokerDefault
+            // discards observer return values, so the controller ran to
+            // completion and only got a 404 rendered over the top of it.
+            // FrontController::dispatch() catches this around processRequest()
+            // and forwards to noroute, so the 404 page still renders.
+            throw new NotFoundException(__('Honeypot triggered.'));
         }
     }
 
