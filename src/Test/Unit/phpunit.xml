@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Der Bootstrap-Pfad haengt am Installationsort: unter
+ * vendor/mediarox/module-honeypot/src/Test/Unit/ sind es sechs Ebenen bis zur Magento-Wurzel.
+ */
+-->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
+         bootstrap="../../../../../../dev/tests/unit/framework/bootstrap.php"
+         cacheResult="false"
+         colors="true"
+         failOnRisky="true"
+         failOnWarning="true">
+    <testsuites>
+        <testsuite name="Mediarox_Honeypot_Unit_Tests">
+            <directory>.</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <ini name="error_reporting" value="-1"/>
+        <ini name="memory_limit" value="-1"/>
+    </php>
+</phpunit>

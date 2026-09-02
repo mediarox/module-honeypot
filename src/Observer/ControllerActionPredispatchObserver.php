@@ -2,19 +2,18 @@
 
 namespace Mediarox\Honeypot\Observer;
 
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Event\Observer;
+use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Exception\NotFoundException;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Validator\NotEmpty;
 use Mediarox\Honeypot\Model\Configuration;
-use Magento\Framework\App\RequestInterface;
-use Magento\Framework\Controller\Result\Forward;
-use Magento\Framework\Controller\Result\ForwardFactory;
-use Magento\Framework\Event\Observer;
-use Magento\Framework\Event\ObserverInterface;
 
 /**
  * Class ControllerActionPredispatchObserver
  *
- * @package Mediarox\Honeypot
+ * @package Mediarox_Honeypot
  */
 class ControllerActionPredispatchObserver implements ObserverInterface
 {
@@ -22,7 +21,6 @@ class ControllerActionPredispatchObserver implements ObserverInterface
 
     public function __construct(
         private Configuration $configuration,
-        private ForwardFactory $forwardFactory,
         private NotEmpty $notEmpty,
         private SerializerInterface $serializer
     ) {
@@ -30,9 +28,10 @@ class ControllerActionPredispatchObserver implements ObserverInterface
 
     /**
      * @param  Observer $observer
-     * @return void|Forward
+     * @return void
+     * @throws NotFoundException
      */
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void
     {
         if (!$this->configuration->isEnabled()) {
             return;
@@ -41,20 +40,35 @@ class ControllerActionPredispatchObserver implements ObserverInterface
         /** @var RequestInterface $request */
         $this->request = $observer->getEvent()
             ->getData('request');
-        $shouldValidate = $this->shouldValidateRequest();
-        if ($shouldValidate && $this->validateRequest()) {
-            return $this->forwardFactory->create()
-                ->forward('noroute');
+
+        if (!$this->shouldValidateRequest() || !$this->isSpam()) {
+            return;
         }
+
+        // Throwing is what actually stops the action. FrontController::dispatch()
+        // catches NotFoundException around processRequest(), forwards to noroute
+        // and re-enters the loop, so the visitor still gets the 404 page.
+        //
+        // Returning a Forward result - what this observer used to do - stops
+        // nothing: Event\Invoker\InvokerDefault discards observer return values,
+        // and Forward::forward() only rewrites the request. The controller ran
+        // to completion, saved the spam, and merely had a 404 rendered over the
+        // top of it. Setting ActionInterface::FLAG_NO_DISPATCH instead does not
+        // work either: the flag is looked up under the action name current at
+        // read time, and forward() has already changed that to "noroute".
+        throw new NotFoundException(__('Honeypot triggered.'));
     }
 
     /**
-     * Validate that the honeypot field is present in request, that field is
-     * empty and that the execution time is not bot related.
+     * The honeypot field is hidden via CSS, so a human never sees it. Anything
+     * in there is conclusive on its own, and it is deliberately not combined
+     * with a second condition: every condition ANDed onto it is one more way
+     * past the honeypot. The previous version also required the form to be
+     * submitted within two seconds, so waiting was enough to get through.
      *
      * @return bool
      */
-    private function validateRequest(): bool
+    private function isSpam(): bool
     {
         $params = $this->request->getParams() ?? [];
         if ($this->request->isAjax()) {
@@ -64,46 +78,20 @@ class ControllerActionPredispatchObserver implements ObserverInterface
             ) : [];
             $params = array_merge($params, $content);
         }
-        $timeLimitExceeded = false;
-        $honeypotNotEmpty = false;
-        if ($params) {
-            $honeypotNotEmpty = $this->validateHoneypot($params);
-            $timeLimitExceeded = $this->validateTimestamp($params);
-        }
-        return $timeLimitExceeded && $honeypotNotEmpty;
+
+        return $params && $this->isHoneypotFilled($params);
     }
 
     /**
-     * Validate that the honeypot field is present in request and that field is
-     * empty.
+     * Validate that the honeypot field is present in the request and filled in.
      */
-    private function validateHoneypot(array $params): bool
+    private function isHoneypotFilled(array $params): bool
     {
         $field = $this->configuration->getFieldName();
 
         return isset($params[$field]) && $this->notEmpty->isValid(
             trim($params[$field])
         );
-    }
-
-    /**
-     * Validate execution time for form action
-     *
-     * @param  array $params
-     * @return bool
-     */
-    private function validateTimestamp(array $params): bool
-    {
-        $timeExceeded = false;
-        if (isset($params['timestamp'])) {
-            $integerTimestamp = (int)$params['timestamp'];
-            $timestamp = $integerTimestamp / 1000;
-            $currentTimestamp = time();
-            $timeElapsed = $currentTimestamp - $timestamp;
-            $timeExceeded = ($timeElapsed < 2);
-        }
-
-        return $timeExceeded;
     }
 
     private function shouldValidateRequest(): bool
