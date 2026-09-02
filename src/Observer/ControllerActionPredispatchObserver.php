@@ -2,14 +2,14 @@
 
 namespace Mediarox\Honeypot\Observer;
 
+use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Framework\Validator\NotEmpty;
+use Mediarox\Honeypot\Model\Configuration;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\Result\Forward;
 use Magento\Framework\Controller\Result\ForwardFactory;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Framework\Serialize\SerializerInterface;
-use Magento\Framework\Validator\NotEmpty;
-use Mediarox\Honeypot\Model\Configuration;
 
 /**
  * Class ControllerActionPredispatchObserver
@@ -21,15 +21,15 @@ class ControllerActionPredispatchObserver implements ObserverInterface
     protected RequestInterface $request;
 
     public function __construct(
-        private Configuration       $configuration,
-        private ForwardFactory      $forwardFactory,
-        private NotEmpty            $notEmpty,
+        private Configuration $configuration,
+        private ForwardFactory $forwardFactory,
+        private NotEmpty $notEmpty,
         private SerializerInterface $serializer
     ) {
     }
 
     /**
-     * @param Observer $observer
+     * @param  Observer $observer
      * @return void|Forward
      */
     public function execute(Observer $observer)
@@ -66,15 +66,11 @@ class ControllerActionPredispatchObserver implements ObserverInterface
         }
         $timeLimitExceeded = false;
         $honeypotNotEmpty = false;
-        $emailValid = true;
         if ($params) {
             $honeypotNotEmpty = $this->validateHoneypot($params);
             $timeLimitExceeded = $this->validateTimestamp($params);
-            if (isset($params['customer_email'])) {
-                $emailValid = $this->validateMail($params);
-            }
         }
-        return $timeLimitExceeded && $honeypotNotEmpty && !$emailValid;
+        return $timeLimitExceeded && $honeypotNotEmpty;
     }
 
     /**
@@ -93,7 +89,7 @@ class ControllerActionPredispatchObserver implements ObserverInterface
     /**
      * Validate execution time for form action
      *
-     * @param array $params
+     * @param  array $params
      * @return bool
      */
     private function validateTimestamp(array $params): bool
@@ -120,16 +116,5 @@ class ControllerActionPredispatchObserver implements ObserverInterface
             true
         );
         return $allowedAction && $isPost;
-    }
-
-    private function validateMail(array $params): bool
-    {
-        $restrictedMail = $this->configuration->getRestrictedMails();
-        $emailValid = true;
-        $email = $params['customer_email'];
-        foreach ($restrictedMail as $key => $value) {
-            $emailValid = str_contains($email, $value);
-        }
-        return $emailValid;
     }
 }
